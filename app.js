@@ -1,23 +1,17 @@
-const express = require('express')
 const createError = require('http-errors');
-const path = require('path')
-const cors = require('cors')
+const express = require('express');
+const path = require('path');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
-const {generateText, translateText }=require('./routes/openai')
-const {normalizePort} = require('./utils')
+const logger = require('morgan');
+const cors = require('cors')
 const indexRouter = require('./routes/index');
-const app = express()
+const openAI = require('./routes/openai')
 
-var port = normalizePort(process.env.PORT || '3000');
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
-
-
+var app = express();
 app.disable('x-powered-by');
 var allowedOrigins = [
+  'http://localhost:8080',
   'http://www.ning-xin.com','https://www.ning-xin.com',
   'http://ning-xin.com','https://ning-xin.com'
 ];
@@ -35,6 +29,12 @@ app.use(cors({
   },
   credentials: true,
 }));
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+app.use(logger('dev'));
 // As long as these two configurations are added, there will be one more attribute on the post request object: body
 // which means you can use req.body to get the sent data
 // parse application/x-www-form-urlencoded
@@ -42,25 +42,14 @@ app.use(bodyParser.urlencoded({extended: false}))
 // parse application/json
 app.use(bodyParser.json());
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.post('/openai/chat/conversition', async (req, res) => {
-  const input = req.body.input
-  console.log('input',input)
-  const model = [
-    "davinci",
-    "text-davinci-002",
-    "text-moderation-playground",
-  ]
-  const data = await generateText(input,model[0]);
-  if(data){
-    res.status(200).json(data)
-  } else{
-    res.status(403).json(data)
-  }
-})
-app.use('/', indexRouter);
+// Home Router
+app.use(indexRouter);
+// openAI - ChatGPT
+app.use(openAI);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -77,9 +66,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-app.listen(port, () => {
-  console.log(`App listening on port ${port}`)
-})
 
 module.exports = app;
