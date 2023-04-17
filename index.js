@@ -7,6 +7,8 @@ const logger = require('morgan');
 const cors = require('cors')
 const indexRouter = require('./routes/index');
 const openAI = require('./routes/openai')
+require("dotenv").config();
+
 const port = process.env.PORT || '3000'
 var app = express();
 app.disable('x-powered-by');
