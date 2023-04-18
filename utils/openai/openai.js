@@ -6,8 +6,13 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
+const onErrorHandler = (err) => {
+  err.config.headers['Authorization'] = '**********'
+  err.config.headers['OpenAI-Organization'] = '**********'
+  return err
+}
 
-async function generateText(prompt, model = 'text-davinci-003') {
+async function generateText(prompt, model = 'text-davinci-003', max_tokens=500) {
   try {
     if (prompt == null) {
       throw new Error("Uh oh, no prompt was provided");
@@ -15,60 +20,47 @@ async function generateText(prompt, model = 'text-davinci-003') {
     const response = await openai.createCompletion({
       model,
       prompt,
+      max_tokens
     });
     return response.data.choices[0].text.trim();
   } catch (err) {
     console.log(err.message);
-    return err
+    return onErrorHandler(err)
   }
-
 }
 
-async function translateText(text, sourceLanguage, targetLanguage, model = 'davinci') {
-  const response = await openai.Translation.create({
-    engine: models[model],
-    text,
-    source_language: sourceLanguage,
-    target_language: targetLanguage,
-  });
-  return response.data.translations[0].translated_text.trim();
+async function generateChatCompletions(prompt, model = 'gpt-3.5-turbo',max_tokens=500) {
+  try {
+    if (prompt == null) {
+      throw new Error("Uh oh, no prompt was provided");
+    }
+    // const response = await openai.createCompletion({
+    const response = await openai.createChatCompletion({
+      model,
+      messages: [{role: "user", content: prompt}],
+      max_tokens
+    });
+    return response.data.choices[0].message.content.trim();
+  } catch (err) {
+    console.log(err.message);
+    return onErrorHandler(err)
+  }
 }
 
-const trainingTask = async (trainFile) => {
-  const trainingData = await openai.training.create({
-    model: "text-davinci-002",
-    data: {
-      file: trainFile
-    },
-    description: "My personal website trainning task"
-  })
-  console.log('trainingData', trainingData)
-
-  //调用 openai.modelVersions.list() 方法来查看新模型版本的列表，并获取新模型版本的 ID：
-  const modelVersions = await openai.modelVersions.list({model: {id: "text-davinci-002"}})
-  const modelVersionId = modelVersions.data[0].id
-  //调用 openai.modelEndpoints.create() 方法来创建一个新的模型终端：
-  const modelEndpoint = await openai.modelEndpoints.create({
-    model: {id: "text-davinci-002"},
-    model_version: {id: modelVersionId},
-    description: "My new model endpoint"
-  })
+async function trainModel() {
+  try {
+    return await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: "I am a highly intelligent question-answering bot. If you ask me a question that is rooted in truth, I will give you the answer. If you ask me a question that is nonsense, trickery or has no clear answer, I will respond with \"Unknown\".\n\nQ: Who are you?\nA: I am ChatXN, the son of the ChatGPT.\n\nQ: What XN means?\nA: XN refers to Xin Ning. He is a front-end development engineer with many years of work experience. Xin is good at JavaScript, Jquery, React, Next.js, Node.js, Vue.js, HTML5 and CSS3.   \n\nQ: Who is Xin Ning?\nA: Xin Ning is a front-end development engineer with many years of work experience, good at JavaScript, Jquery, React, Next.js, Node.js, Vue.js, HTML5 and CSS3. Here, you can find Ning Xin's latest work, related technologies, and resume. If you need help with a project or technical problem, you can send an email to Ningxin, the email address is: ningxin1007@hotmail.com.\n\nQ: What is Xin's LinkedIn?\nA: https://www.linkedin.com/in/xinning1007\n\nQ:  What is Xin's Social Media?\nA: LinkedIn:  https://www.linkedin.com/in/xinning1007    Facebook: https://www.facebook.com/jxnx888    \n ",
+    })
+  } catch (err) {
+    console.log(err.message);
+    return onErrorHandler(err)
+  }
 }
-async function trainModel(prompt, examples, model) {
-  const trainingData = {
-    model: model,
-    prompt: prompt,
-    examples: examples,
-  };
 
-  const trainingTask = new Training(trainingData);
-
-  const trainingResult = await openai.Training.create(trainingTask);
-  console.log(trainingResult);
-  return trainingResult;
-}
 module.exports = {
   generateText,
-  translateText,
+  generateChatCompletions,
   trainModel
 };

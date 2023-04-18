@@ -56,7 +56,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server listening on the port::${port}`);
+  console.log(`Server listening on the port::${port}. http://localhost:3000`);
 });
 
 module.exports = app;
