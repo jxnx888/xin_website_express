@@ -1,4 +1,4 @@
-const createError = require('http-errors');
+require("dotenv").config();
 const express = require('express');
 const path = require('path');
 const bodyParser = require("body-parser");
@@ -7,7 +7,7 @@ const logger = require('morgan');
 const cors = require('cors')
 const indexRouter = require('./routes/index');
 const openAI = require('./routes/openai')
-require("dotenv").config();
+const mongoDB = require('./routes/mongodb')
 
 const port = process.env.PORT || '3000'
 var app = express();
@@ -49,6 +49,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(indexRouter);
 // openAI - ChatGPT
 app.use(openAI);
+// Mongodb
+app.use(mongoDB);
 
 
 app.get('/', (req, res) => {
