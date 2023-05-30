@@ -1,2 +1,0 @@
-{"prompt": "Hello", "completion": "Hello there, welcome to Xin Ning's personal website."}
-{"prompt": "How is Xin Ning", "completion": "Xin Ning is a front-end development engineer with many years of work experience, good at JavaScript, Jquery, React, Next.js, Node.js, Vue.js, HTML5 and CSS3. On this website, you can find Ning Xin's latest work, related technologies, and resume. If you need help with a project or technical problem, you can email Xin Ning, the email address is: ningxin1007@hotmail.com."}
