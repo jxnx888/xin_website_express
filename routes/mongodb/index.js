@@ -9,14 +9,14 @@ const EN = 'en';
 const CN = 'cn';
 const COLLECTION_PROJECT = 'project';
 const COLLECTION_BLOG = 'blog';
-mongoDB.get('/website/:locale/projects', async (req, res, next) => {
+mongoDB.get('/:locale/projects', async (req, res, next) => {
   const {locale} = req.params
   const collections = filterLocale(locale)
   const Data = await connectMongoDB(collections.project)
   res.status(200).json(Data)
 });
 
-mongoDB.get('/website/:locale/blogs', async (req, res, next) => {
+mongoDB.get('/:locale/blogs', async (req, res, next) => {
   const {locale} = req.params
   const collections = filterLocale(locale)
   const Data = await connectMongoDB(collections.blog)
@@ -38,7 +38,7 @@ const filterLocale = (locale)=>{
       }
   }
 }
-mongoDB.post('/website/insert', async (req, res, next) => {
+mongoDB.post('/insert', async (req, res, next) => {
   const Data = await connectMongoDB(COLLECTION_BLOG)
   res.status(200).json(Data)
 });

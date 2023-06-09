@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const Schema = mongoose.Schema;
 
@@ -12,30 +12,30 @@ export const UserSchema = new Schema({
     type:String,
     required:'Enter your last name'
   },
-  userName:{
-    type:String,
-    required:true
+  username: {
+    type: String,
+    required: true
   },
-  email:{
-    type:String,
-    required:'Enter your last name'
+  email: {
+    type: String,
+    required: true
   },
   phone:{
     type:String
   },
-  hasPassword:{
-    type:String,
-    required:String
+  hashPassword: {
+    type: String,
+    required: true
   },
-  created_data:{
+  created_date: {
     type: Date,
-    default:Date.now
+    default: Date.now
   }
-})
+});
 
-/*
-  Add the method into schema
-*/
-UserSchema.method.comparePassword = (password, hasPassword)=> {
-  return bcrypt.compareSync(password,hasPassword)
+UserSchema.methods.comparePassword = (password, hashPassword) => {
+  return bcrypt.compareSync(password, hashPassword);
 };
+
+
+module.exports = UserSchema;

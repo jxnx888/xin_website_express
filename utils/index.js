@@ -1,3 +1,8 @@
+require("dotenv").config();
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
 const normalizePort = (val) => {
   var port = parseInt(val, 10);
 
@@ -13,8 +18,10 @@ const normalizePort = (val) => {
 
   return false;
 }
+const port = normalizePort(process.env.PORT || '3000');
 
 
 module.exports = {
-  normalizePort
+  normalizePort,
+  port
 }

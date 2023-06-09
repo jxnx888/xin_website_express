@@ -1,11 +1,21 @@
 require("dotenv").config();
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const indexRouter = express.Router();
+const {port} = require('../utils')
+const openAIRouter = require('./openAI/openai')
+const mongoDBRouter = require('./mongodb')
+const userRouter = require('./user')
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  // res.render('index', { title: `Express`, content:`App listening on port ${process.env.PORT || '3000'}` });
-  res.json({message:`App listening on port ${process.env.PORT || '3000'}`})
+
+indexRouter.get('/', (req, res) => {
+  const result = `Server listening on the port::${port}. http://localhost:3000`
+  console.log(result);
+  res.send(result);
 });
 
-module.exports = router;
+module.exports = {
+  indexRouter,
+  openAIRouter,
+  mongoDBRouter,
+  userRouter
+};

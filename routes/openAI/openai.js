@@ -2,9 +2,9 @@ require("dotenv").config();
 const express = require('express');
 const openAI = express.Router();
 
-const {generateText, generateChatCompletions, trainModel} = require('../utils/openai/openai')
+const {generateText, generateChatCompletions, trainModel} = require('../../utils/openai/openai')
 
-openAI.get('/openai', function (req, res, next) {
+openAI.get('/', function (req, res, next) {
   res.render('index', {title: `Express`, content: `App listening on port ${process.env.PORT || '3000'}`});
 });
 openAI.get('/openai/training', function (req, res, next) {

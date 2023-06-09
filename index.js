@@ -1,18 +1,33 @@
 require("dotenv").config();
 const express = require('express');
+const createError = require('http-errors');
 const path = require('path');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors')
-const indexRouter = require('./routes/index');
-const openAI = require('./routes/openai')
-const mongoDB = require('./routes/mongodb')
-
+const {indexRouter, openAIRouter, mongoDBRouter, userRouter} = require('./routes/index')
+const mongoose = require('mongoose');
+const {mongodbConfig} = require('./config');
 const port = process.env.PORT || '3000'
-var app = express();
+const app = express();
+
+// mongoose connection
+const connectToMongoose = async () => {
+  return await mongoose.connect(mongodbConfig?.uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true
+  })
+}
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+
 app.disable('x-powered-by');
-var allowedOrigins = [
+const allowedOrigins = [
   'http://localhost:8080',
   'http://www.ning-xin.com', 'https://www.ning-xin.com',
   'http://ning-xin.com', 'https://ning-xin.com'
@@ -45,20 +60,30 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Home Router
-app.use(indexRouter);
+
+// Index
+app.use('/', indexRouter);
 // openAI - ChatGPT
-app.use(openAI);
+app.use('/openai', openAIRouter);
 // Mongodb
-app.use(mongoDB);
+app.use('/website', mongoDBRouter);
+// Register system
+// app.use(user);
 
-
-app.get('/', (req, res) => {
-  res.send(`Server is running on the port::${port}!!!!`);
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+  next(createError(404));
 });
 
-app.listen(port, () => {
-  console.log(`Server listening on the port::${port}. http://localhost:3000`);
+// error handler
+app.use(function (err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
 });
 
 module.exports = app;
